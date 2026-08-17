@@ -1,0 +1,56 @@
+{
+    "name": "hampel/console-report",
+    "description": "Console output for CLI tools that report on themselves - settings dumps and validation checks, with paths printed whole",
+    "authors": [
+        {
+            "name": "Simon Hampel",
+            "email": "simon@hampelgroup.com",
+            "role": "Developer"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/hampel/console-report/issues",
+        "source": "https://github.com/hampel/console-report"
+    },
+    "keywords": [
+        "console",
+        "laravel",
+        "laravel-zero",
+        "cli"
+    ],
+    "homepage": "https://github.com/hampel/console-report",
+    "license": "MIT",
+    "require": {
+        "php": ">=8.3",
+        "illuminate/console": "^12.0|^13.0"
+    },
+    "require-dev": {
+        "laravel/pint": "^1.30",
+        "phpstan/phpstan": "^2.0",
+        "phpunit/phpunit": "^12.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Hampel\\ConsoleReport\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Hampel\\ConsoleReport\\Tests\\": "tests/"
+        }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "scripts": {
+        "test": "phpunit",
+        "analyse": "phpstan analyse",
+        "format": "pint",
+        "lint": "pint --test",
+        "check": [
+            "@lint",
+            "@analyse",
+            "@test"
+        ]
+    }
+}
