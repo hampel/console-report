@@ -34,7 +34,7 @@ every value, with no way to opt out:
 
 ```
   Environment File ...................................................... .env
-  Sites Path .............................................. storage/wback.toml
+  Sites Path .............................................. storage/sites.toml
   Backup Disk ................................................. storage/backup
 ```
 
@@ -84,15 +84,15 @@ class Config extends Command
 ```
 
 ```
-  Application ......................................................................
-  Version .................................................................... 7.2.0
-  Environment File ............................................. /etc/wback/.env
+  Application ................................................................
+  Version .............................................................. 7.2.0
+  Environment File .......................................... /etc/backup/.env
 
-  Backup ...........................................................................
-  Sites Path ....................... wback.toml (relative to /srv/backup)
-  Cloud Remote ............................................................. not set
-  Extra Options ................................... --password=redacted --quick
-  API Token .................................................. set (40 characters)
+  Backup .....................................................................
+  Sites Path ............................ sites.toml (relative to /srv/backup)
+  Cloud Remote ....................................................... not set
+  Extra Options .................................. --password=redacted --quick
+  API Token .............................................. set (40 characters)
 ```
 
 The content stays with your application. What a tool's settings dump should contain is an editorial

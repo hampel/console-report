@@ -12,10 +12,10 @@ class RendersDetailsTest extends TestCase
 {
     public function testItLeadsFromTheLabelToTheValue(): void
     {
-        $output = $this->render(fn (ReportCommand $command) => $command->showDetail('Sites Path', '/etc/wback/wback.toml'));
+        $output = $this->render(fn (ReportCommand $command) => $command->showDetail('Sites Path', '/etc/backup/sites.toml'));
 
         $this->assertSame(
-            '  Sites Path ' . str_repeat('.', 100 - 2 - 4 - 10 - 21) . ' /etc/wback/wback.toml',
+            '  Sites Path ' . str_repeat('.', 100 - 2 - 4 - 10 - 22) . ' /etc/backup/sites.toml',
             $this->lines($output)[0]
         );
     }
@@ -41,7 +41,7 @@ class RendersDetailsTest extends TestCase
     public function testItWrapsAValueThatWillNotFitRatherThanCuttingItOff(): void
     {
         // a truncated path is worth less than nothing: it still looks like a path
-        $path = '/mnt/' . str_repeat('backup-volume/', 8) . 'wback.toml';
+        $path = '/mnt/' . str_repeat('backup-volume/', 8) . 'sites.toml';
 
         $output = $this->render(fn (ReportCommand $command) => $command->showDetail('Sites Path', $path));
 

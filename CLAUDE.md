@@ -23,7 +23,8 @@ php8.5 vendor/bin/phpunit                       # ceiling of the supported range
 ```
 
 `composer check` runs Pint, PHPStan and the suite — the same three things CI runs, so a green check
-locally means a green build.
+locally means a green build. Individually: `composer lint` (Pint, no writes), `composer format`
+(Pint, writing), `composer analyse`, `composer test`.
 
 ## Testing
 
@@ -66,16 +67,30 @@ over what the framework already ships.
 **Wrap, never truncate.** A path cut off mid-string still looks like a path and is not one, so a
 value that will not fit goes on its own line. Nothing here should ever gain a truncating branch.
 
+**The four check outcomes are a contract, not a palette.** `[ ok ]`, `[warn]`, `[fail]` and the
+blank marker mean the same thing in every tool that uses this, because the person reading them is
+reading them mid-incident: a warning does not stop the tool working, and a skip is a check that had
+nothing to say rather than one that passed. `checkExitCode()` follows from that — only a failure
+exits non-zero — which is what makes a validation command usable as a post-deploy gate. Adding a
+fifth outcome, or making a warning exit non-zero, changes behaviour in every consumer at once.
+
 ## Version support
 
-Tier A under `/srv/www/version-support.html`: PHP 8.3+ (the floor for new work) through 8.5, and
-`illuminate/console` `^12|^13`. CI tests the three corners of that range rather than the matrix —
-platform floor with `--prefer-lowest`, span ceiling, and newest platform on the oldest PHP — and
-PHPStan analyses the whole 8.3-8.5 PHP range in one pass. Keep `phpstan.neon`'s `phpVersion` and the
-CI matrix in step with the constraints in `composer.json`.
+PHP 8.3 through 8.5, and `illuminate/console` `^12|^13`. Both are deliberate policy rather than
+whatever happened to resolve: `composer.json` is the source of truth, and neither constraint should
+be widened or narrowed casually, since dropping a supported version after release is a major.
+
+CI tests the three corners of that range rather than the whole matrix — platform floor with
+`--prefer-lowest`, span ceiling, and newest platform on the oldest PHP — and PHPStan analyses the
+whole 8.3-8.5 PHP range in one pass. Keep `phpstan.neon`'s `phpVersion` and the CI matrix in step
+with the constraints in `composer.json`.
 
 ## Conventions
 
 PSR-12 via Pint (`pint.json` sets the preset), `declare(strict_types=1)` in every file, and PHPStan
-at level 10 over `src` and `tests` both. This is **not** the Allman-braced style of the `wback`
-application the code came from — it was reformatted on the way in, and belongs to the package now.
+at level 10 over `src` and `tests` both. Run `composer format` rather than matching the brace style
+of code you are pasting in from elsewhere; Pint is the arbiter.
+
+A new dev-only file at the repo root — a tool config, a CI helper — needs an `export-ignore` line in
+`.gitattributes`, which is what keeps the Packagist dist archive down to `src`, the README, the
+licence and the changelog.

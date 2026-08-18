@@ -14,8 +14,8 @@ class FormatsValuesTest extends TestCase
     public function testItPrintsAnAbsolutePathAsItIs(): void
     {
         $this->assertSame(
-            '/etc/wback/wback.toml',
-            $this->format(fn (ReportCommand $command) => $command->formatPath('/etc/wback/wback.toml'))
+            '/etc/backup/sites.toml',
+            $this->format(fn (ReportCommand $command) => $command->formatPath('/etc/backup/sites.toml'))
         );
     }
 
@@ -23,8 +23,8 @@ class FormatsValuesTest extends TestCase
     {
         // the same setting names different files depending on where it was run from
         $this->assertSame(
-            'wback.toml <fg=yellow>(relative to ' . getcwd() . ')</>',
-            $this->format(fn (ReportCommand $command) => $command->formatPath('wback.toml'))
+            'sites.toml <fg=yellow>(relative to ' . getcwd() . ')</>',
+            $this->format(fn (ReportCommand $command) => $command->formatPath('sites.toml'))
         );
     }
 
