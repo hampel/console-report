@@ -38,6 +38,11 @@ framework they need is the container `Command::run()` dispatches `handle()` thro
 (`runningUnitTests()`). If a future trait needs config or storage, that is the point to reach for
 Testbench rather than to keep extending the stub.
 
+**No larastan either.** It bootstraps a Laravel application to read `LARAVEL_VERSION` and there is
+none here, so PHPStan aborts before analysing anything. It also wants `illuminate/database` and 26
+other packages in order to reason about Eloquent and facades, none of which this package uses —
+`src` imports only `Symfony\Component\Console\Terminal` and Symfony's `Command`.
+
 Two things to know before adding tests:
 
 - **Terminal width is an input.** `TestCase` pins `COLUMNS` to 100 so line lengths are assertable,
