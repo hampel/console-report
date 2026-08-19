@@ -46,8 +46,14 @@ jobs:
 
       - run: vendor/bin/phpunit
 
-  analyse:
-    name: Static analysis
+      # Also here, not only in a job of its own: phpstan.neon covers the whole 8.3 - 8.5
+      # PHP range in one pass wherever it runs, but its result still depends on the
+      # dependency tree it resolved against - including phpstan's own version, which is
+      # what the --prefer-lowest corner is for.
+      - run: vendor/bin/phpstan analyse --no-progress
+
+  lint:
+    name: Lint
     runs-on: ubuntu-latest
 
     steps:
@@ -63,7 +69,3 @@ jobs:
       - run: composer install --prefer-dist --no-progress
 
       - run: vendor/bin/pint --test
-
-      # Runs once rather than per version: phpstan.neon analyses the whole
-      # 8.3 - 8.5 range in a single pass, whatever PHP it runs on.
-      - run: vendor/bin/phpstan analyse --no-progress
