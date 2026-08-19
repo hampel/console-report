@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+Unreleased
+----------
+
+* `symfony/console` is now declared as a dependency
+* `phpstan/phpstan` requires `^2.1.22`
+* added a harness for looking at the rendered output, run with `vendor/bin/rig`
+
 1.0.0 (2026-08-19)
 ------------------
 
