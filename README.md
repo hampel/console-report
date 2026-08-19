@@ -34,7 +34,7 @@ every value, with no way to opt out:
 
 ```
   Environment File ...................................................... .env
-  Sites Path .............................................. storage/sites.toml
+  Targets Path .......................................... storage/targets.toml
   Backup Disk ................................................. storage/backup
 ```
 
@@ -71,7 +71,7 @@ class Config extends Command
             ],
 
             'Backup' => [
-                'Sites Path' => $this->path(config('backup.sites_path')),
+                'Targets Path' => $this->path(config('backup.targets_path')),
                 'Cloud Remote' => $this->required(config('backup.cloud_remote')),
                 'Extra Options' => $this->redacted(config('backup.options')),
                 'API Token' => $this->secretStatus(config('backup.token')),
@@ -89,7 +89,7 @@ class Config extends Command
   Environment File .......................................... /etc/backup/.env
 
   Backup .....................................................................
-  Sites Path ............................ sites.toml (relative to /srv/backup)
+  Targets Path ........................ targets.toml (relative to /srv/backup)
   Cloud Remote ....................................................... not set
   Extra Options .................................. --password=redacted --quick
   API Token .............................................. set (40 characters)

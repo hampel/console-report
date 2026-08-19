@@ -12,10 +12,10 @@ class RendersDetailsTest extends TestCase
 {
     public function testItLeadsFromTheLabelToTheValue(): void
     {
-        $output = $this->render(fn (ReportCommand $command) => $command->showDetail('Sites Path', '/etc/backup/sites.toml'));
+        $output = $this->render(fn (ReportCommand $command) => $command->showDetail('Targets Path', '/etc/backup/targets.toml'));
 
         $this->assertSame(
-            '  Sites Path ' . str_repeat('.', 100 - 2 - 4 - 10 - 22) . ' /etc/backup/sites.toml',
+            '  Targets Path ' . str_repeat('.', 100 - 2 - 4 - 12 - 24) . ' /etc/backup/targets.toml',
             $this->lines($output)[0]
         );
     }
@@ -41,11 +41,11 @@ class RendersDetailsTest extends TestCase
     public function testItWrapsAValueThatWillNotFitRatherThanCuttingItOff(): void
     {
         // a truncated path is worth less than nothing: it still looks like a path
-        $path = '/mnt/' . str_repeat('backup-volume/', 8) . 'sites.toml';
+        $path = '/mnt/' . str_repeat('backup-volume/', 8) . 'targets.toml';
 
-        $output = $this->render(fn (ReportCommand $command) => $command->showDetail('Sites Path', $path));
+        $output = $this->render(fn (ReportCommand $command) => $command->showDetail('Targets Path', $path));
 
-        $this->assertSame(['  Sites Path', '    ' . $path], $this->lines($output));
+        $this->assertSame(['  Targets Path', '    ' . $path], $this->lines($output));
     }
 
     public function testItWrapsWithoutAValueLineWhenThereIsNoValue(): void
