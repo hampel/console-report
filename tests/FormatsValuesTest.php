@@ -28,6 +28,26 @@ class FormatsValuesTest extends TestCase
         );
     }
 
+    public function testItSaysOnlyThatAPathIsRelativeWhenItCannotTellAgainstWhat(): void
+    {
+        // getcwd() fails when the directory is removed under the process - a cron job
+        // whose working directory went away between runs
+        $cwd = getcwd();
+        $gone = sys_get_temp_dir() . '/console-report-' . bin2hex(random_bytes(6));
+        mkdir($gone);
+        chdir($gone);
+        rmdir($gone);
+
+        try {
+            $this->assertSame(
+                'targets.toml <fg=yellow>(relative)</>',
+                $this->format(fn (ReportCommand $command) => $command->formatPath('targets.toml'))
+            );
+        } finally {
+            chdir($cwd === false ? sys_get_temp_dir() : $cwd);
+        }
+    }
+
     #[DataProvider('absolutePaths')]
     public function testItRecognisesTheAbsolutePathsOfEveryPlatform(string $path): void
     {
