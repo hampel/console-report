@@ -1,6 +1,11 @@
 parameters:
     level: 10
 
+    # Both, and tests is not optional: PHPStan analyses a trait only through a class that
+    # uses one, and every line this package ships is in a trait. tests/ReportCommand.php
+    # is the only class that uses them, so it is what gives them an
+    # Illuminate\Console\Command context - and what makes `level: 10` mean anything.
+    # Analysing src alone reports "trait is used zero times" four times and checks nothing.
     paths:
         - src
         - tests
