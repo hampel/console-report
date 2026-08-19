@@ -38,6 +38,20 @@ class RendersChecksTest extends TestCase
         $this->assertSame('  [ ok ] zip        /usr/bin/zip', $this->lines($output)[0]);
     }
 
+    public function testItLinesUpTheDetailColumnForAMultibyteLabel(): void
+    {
+        // the label column is padded to a visible width, not a byte count
+        $output = $this->render(function (ReportCommand $command) {
+            $command->showOk('sauvegarde reseau', 'detail');
+            $command->showOk('sauvegarde réseau', 'detail');
+        });
+
+        [$ascii, $multibyte] = $this->lines($output);
+
+        $this->assertSame(mb_strlen($ascii), mb_strlen($multibyte));
+        $this->assertSame(mb_strpos($ascii, 'detail'), mb_strpos($multibyte, 'detail'));
+    }
+
     public function testItLeavesNoTrailingSpaceOnACheckWithNoDetail(): void
     {
         $output = $this->render(fn (ReportCommand $command) => $command->showOk('lock'));

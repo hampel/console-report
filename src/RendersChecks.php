@@ -62,7 +62,14 @@ trait RendersChecks
 
     protected function checkResult(string $marker, string $label, string $detail): void
     {
-        $this->line(rtrim(sprintf("  %s %-{$this->checkLabelWidth}s %s", $marker, $label, $detail)));
+        // mb_str_pad, not sprintf's %-Ns: that pads to a byte count, so a label with any
+        // multibyte character in it drags the detail column left one column per character
+        $this->line(rtrim(sprintf(
+            '  %s %s %s',
+            $marker,
+            mb_str_pad($label, $this->checkLabelWidth),
+            $detail
+        )));
     }
 
     protected function checksFailed(): bool
