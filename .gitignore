@@ -5,3 +5,10 @@ composer.lock
 .idea/
 .phpunit.cache/
 CLAUDE.local.md
+
+# harness/ exercises run against real things eventually, and the leak happens at the
+# commit that adds the first real value, not at the one that adds the rule. Unanchored:
+# rig's --env= resolves relative to the package, so one can sit in a subdirectory.
+.env
+.env.*
+!.env.example

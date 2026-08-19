@@ -26,6 +26,23 @@ php8.5 vendor/bin/phpunit                       # ceiling of the supported range
 locally means a green build. Individually: `composer lint` (Pint, no writes), `composer format`
 (Pint, writing), `composer analyse`, `composer test`.
 
+## Looking at the output
+
+```bash
+vendor/bin/rig report                 # render the real thing, in colour
+vendor/bin/rig report --php=php8.5    # the same, at the ceiling of the range
+```
+
+`harness/report.php` drives the traits from inside a command that uses them, the way a consumer
+does, and writes to the terminal rather than to a buffer. It is not a test — it asserts nothing and
+returns no verdict — and it is not run by CI. It is there because whether output *reads well* is the
+whole design brief and is not a thing the suite can tell you: `BufferedOutput` is undecorated, so
+every assertion in `tests/` sees `<fg=yellow>` as a literal tag and never as a colour.
+
+**The README's two output blocks come from here.** They are quoted at `COLUMNS=80`, which the first
+half of the exercise pins, so regenerate rather than hand-edit them — a pasted block gets adjusted
+when its values change and quietly stops matching what the renderer emits.
+
 ## Testing
 
 `tests/TestCase.php` runs a real `Illuminate\Console\Command` and hands back what it wrote.
