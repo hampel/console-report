@@ -38,9 +38,11 @@ jobs:
           php-version: ${{ matrix.php }}
           coverage: none
 
-      - run: composer require "illuminate/console:${{ matrix.laravel }}" --no-interaction --no-update
-
-      - run: composer update --prefer-dist --no-progress ${{ matrix.deps }}
+      # --with, not `composer require`: it constrains within the declared range and
+      # refuses to go outside it, so the matrix cannot drift away from composer.json
+      # without the job failing. `require` would replace the constraint instead, and a
+      # corner testing a Laravel version the package no longer claims would still pass.
+      - run: composer update --with="illuminate/console:${{ matrix.laravel }}" --prefer-dist --no-progress ${{ matrix.deps }}
 
       - run: vendor/bin/phpunit
 
