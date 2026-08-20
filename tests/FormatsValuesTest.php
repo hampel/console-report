@@ -67,6 +67,38 @@ class FormatsValuesTest extends TestCase
         ];
     }
 
+    #[DataProvider('streamWrapperUris')]
+    public function testItLeavesAStreamWrapperUriAsItIs(string $uri): void
+    {
+        // a URI locates a resource outright, so there is no working directory for it to
+        // resolve against and saying what it is relative to would be inventing an answer
+        $this->assertSame($uri, $this->format(fn (ReportCommand $command) => $command->formatPath($uri)));
+    }
+
+    /**
+     * @return array<string, array{string}>
+     */
+    public static function streamWrapperUris(): array
+    {
+        return [
+            // what base_path() reports in a built phar - the case this was found in
+            'phar' => ['phar:///opt/bin/sites'],
+            'phar, a file inside the archive' => ['phar:///opt/bin/sites/.env'],
+            'remote scheme' => ['s3://bucket/key'],
+        ];
+    }
+
+    public function testItDoesNotMistakeAnRcloneRemoteForAUri(): void
+    {
+        // 'export:backups' has a colon and no scheme separator, and is not a path at all -
+        // required() is where a remote belongs. Requiring the '//' keeps that division
+        // intact rather than making path() look as though it handles one.
+        $this->assertSame(
+            'export:backups <fg=yellow>(relative to ' . getcwd() . ')</>',
+            $this->format(fn (ReportCommand $command) => $command->formatPath('export:backups'))
+        );
+    }
+
     public function testItReportsAPathThatIsNotSet(): void
     {
         $this->assertSame('<fg=yellow>not set</>', $this->format(fn (ReportCommand $command) => $command->formatPath(null)));

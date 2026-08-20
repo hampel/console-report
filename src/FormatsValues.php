@@ -16,11 +16,12 @@ trait FormatsValues
     /**
      * A filesystem path, stated so that it can be acted on without guessing.
      *
-     * Absolute paths print as they are. A relative one is reported along with what it
-     * resolves against, because it resolves against the process working directory -
-     * which under cron is wherever the crontab last changed to - so the same setting
-     * names different files depending on where the command was run from. Printing it
-     * bare hides exactly the thing that makes it ambiguous.
+     * Absolute paths print as they are, and so do stream wrapper URIs - a file inside a
+     * phar is `phar:///opt/bin/tool`, which has nothing to be relative to. A relative path
+     * is reported along with what it resolves against, because it resolves against the
+     * process working directory - which under cron is wherever the crontab last changed
+     * to - so the same setting names different files depending on where the command was
+     * run from. Printing it bare hides exactly the thing that makes it ambiguous.
      */
     protected function path(?string $value): string
     {
@@ -98,6 +99,11 @@ trait FormatsValues
     {
         return str_starts_with($value, '/')
             || str_starts_with($value, '\\\\')
-            || preg_match('#^[A-Za-z]:[\\\\/]#', $value) === 1;
+            || preg_match('#^[A-Za-z]:[\\\\/]#', $value) === 1
+            // A stream wrapper URI - phar://, file://, s3:// - locates a resource outright.
+            // There is no working directory for it to resolve against, so saying what it is
+            // relative to would be inventing an answer. The '//' is required: an rclone
+            // remote is spelled 'export:backups', which has a colon and is not a path at all.
+            || preg_match('#^[A-Za-z][A-Za-z0-9+.-]*://#', $value) === 1;
     }
 }

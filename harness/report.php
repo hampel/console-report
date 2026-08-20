@@ -146,6 +146,7 @@ $run(function () {
     'Formatters' => [
         'path, absolute' => $this->path('/srv/backup/targets.toml'),
         'path, relative' => $this->path('targets.toml'),
+        'path, phar URI' => $this->path('phar:///opt/bin/sites'),
         'path, unset' => $this->path(null),
         'required' => $this->required('a value the tool needs'),
         'required, unset' => $this->required(''),

@@ -111,7 +111,9 @@ it reads as a setting the tool does not have.
 
 `path()` says what a relative path resolves against because it resolves against the process working
 directory — which under cron is wherever the crontab last changed to — so the same setting names
-different files depending on where the command was run from.
+different files depending on where the command was run from. A stream wrapper URI is left as it is:
+inside a built phar, `base_path()` is `phar:///opt/bin/tool`, which locates the file outright and has
+no working directory to resolve against.
 
 `redacted()` covers the flag spellings people actually use (`--password=`, `-p`, and long options
 whose names contain `pass`, `secret` or `token`) rather than every conceivable one. Credentials

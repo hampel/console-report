@@ -4,6 +4,8 @@ CHANGELOG
 Unreleased
 ----------
 
+* fixed `path()` reporting a stream wrapper URI as relative — inside a built phar,
+  `phar:///opt/bin/tool` was printed as being relative to the working directory
 * `symfony/console` is now declared as a dependency
 * `phpstan/phpstan` requires `^2.1.22`
 * added a harness for looking at the rendered output, run with `vendor/bin/rig`
