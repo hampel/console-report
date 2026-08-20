@@ -1,8 +1,8 @@
 CHANGELOG
 =========
 
-Unreleased
-----------
+1.0.1 (2026-08-20)
+------------------
 
 * fixed `path()` reporting a stream wrapper URI as relative — inside a built phar,
   `phar:///opt/bin/tool` was printed as being relative to the working directory
