@@ -18,10 +18,12 @@ use Symfony\Component\Console\Terminal;
  * one mutation a settings dump cannot afford, since "which file is this actually
  * reading" is the question being asked.
  *
- * Expects the using class to be an Illuminate\Console\Command.
+ * Expects the using class to have called setReportOutput() first - see WritesReportOutput.
  */
 trait RendersDetails
 {
+    use WritesReportOutput;
+
     /**
      * Widest line to draw, however wide the terminal is.
      *
@@ -45,10 +47,10 @@ trait RendersDetails
         $room = $width - 2 - $spacing - $this->visibleLength($label) - $this->visibleLength($value);
 
         if ($room < 2) {
-            $this->line("  {$label}");
+            $this->reportLine("  {$label}");
 
             if ($value !== '') {
-                $this->line("    {$value}");
+                $this->reportLine("    {$value}");
             }
 
             return;
@@ -56,7 +58,7 @@ trait RendersDetails
 
         $line = "  {$label} <fg=gray>" . str_repeat('.', $room) . '</>';
 
-        $this->line($value === '' ? $line : "{$line} {$value}");
+        $this->reportLine($value === '' ? $line : "{$line} {$value}");
     }
 
     /**

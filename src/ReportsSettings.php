@@ -30,7 +30,7 @@ trait ReportsSettings
                 continue;
             }
 
-            $this->newLine();
+            $this->reportLine();
             $this->heading($heading);
 
             foreach ($settings as $label => $value) {
@@ -38,7 +38,7 @@ trait ReportsSettings
             }
         }
 
-        $this->newLine();
+        $this->reportLine();
     }
 
     /**

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Hampel\ConsoleReport\Tests;
 
-use Illuminate\Console\OutputStyle;
 use PHPUnit\Framework\TestCase as BaseTestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
@@ -12,9 +11,9 @@ use Symfony\Component\Console\Output\BufferedOutput;
 /**
  * Runs a command and hands back what it wrote.
  *
- * A container rather than a whole application: Illuminate\Console\Command dispatches
- * handle() through the container, and that is the only part of a framework these traits
- * touch. Nothing here needs config, so nothing here needs Testbench.
+ * Plain Symfony Console, because that is the whole of what the package requires. There is
+ * no framework here to need Testbench, and no container either - a command is constructed
+ * and run directly.
  */
 abstract class TestCase extends BaseTestCase
 {
@@ -69,12 +68,10 @@ abstract class TestCase extends BaseTestCase
     private function execute(callable $report, array $input): array
     {
         $command = new ReportCommand($report);
-        $command->setLaravel(new TestContainer());
 
-        $arguments = new ArrayInput($input);
         $buffer = new BufferedOutput();
 
-        $code = $command->run($arguments, new OutputStyle($arguments, $buffer));
+        $code = $command->run(new ArrayInput($input), $buffer);
 
         return ['code' => $code, 'output' => $buffer->fetch()];
     }

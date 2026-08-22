@@ -19,10 +19,12 @@ use Symfony\Component\Console\Command\Command;
  * The tallies are kept so that the command can exit non-zero without counting for
  * itself, which is what makes it usable as a post-deploy check.
  *
- * Expects the using class to be an Illuminate\Console\Command.
+ * Expects the using class to have called setReportOutput() first - see WritesReportOutput.
  */
 trait RendersChecks
 {
+    use WritesReportOutput;
+
     /**
      * Width of the label column, wide enough for the longest label in the run.
      */
@@ -64,7 +66,7 @@ trait RendersChecks
     {
         // mb_str_pad, not sprintf's %-Ns: that pads to a byte count, so a label with any
         // multibyte character in it drags the detail column left one column per character
-        $this->line(rtrim(sprintf(
+        $this->reportLine(rtrim(sprintf(
             '  %s %s %s',
             $marker,
             mb_str_pad($label, $this->checkLabelWidth),

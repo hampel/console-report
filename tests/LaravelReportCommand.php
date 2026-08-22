@@ -7,54 +7,44 @@ namespace Hampel\ConsoleReport\Tests;
 use Hampel\ConsoleReport\FormatsValues;
 use Hampel\ConsoleReport\RendersChecks;
 use Hampel\ConsoleReport\ReportsSettings;
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\OutputInterface;
+use Illuminate\Console\Command;
 
 /**
  * A command using every trait, driven by a closure the test supplies.
  *
- * Plain Symfony Console and nothing else, because that is now the whole of what the
- * package asks for - the same shape a XenForo add-on command has. The Laravel side is a
- * consumer of this like any other, and is covered by LaravelIntegrationTest.
- *
  * The trait methods are protected, as they are meant to be used - so a test reaches them
  * the way an application would, from inside the command that uses them. The passthroughs
- * keep the names they had when the parent was Illuminate\Console\Command, where `fail()`
- * and `warn()` are both taken; that is the collision the check methods are prefixed to
- * avoid, and it does not go away just because this parent is Symfony's.
+ * are named so that none of them collides with a method Illuminate\Console\Command
+ * already has: `fail()` and `warn()` are both taken, which is the trap the check methods
+ * are prefixed to avoid in the first place.
  */
-class ReportCommand extends Command
+class LaravelReportCommand extends Command
 {
     use FormatsValues;
     use RendersChecks;
     use ReportsSettings;
 
+    /** @var string */
+    protected $signature = 'report {--only=}';
+
     /** @var callable(self): mixed */
     protected $report;
-
-    private ?InputInterface $input = null;
 
     /**
      * @param callable(self): mixed $report
      */
     public function __construct(callable $report)
     {
-        parent::__construct('report');
+        parent::__construct();
 
         $this->report = $report;
     }
 
-    protected function configure(): void
+    public function handle(): int
     {
-        $this->addOption('only', null, InputOption::VALUE_REQUIRED);
-    }
-
-    protected function execute(InputInterface $input, OutputInterface $output): int
-    {
-        $this->input = $input;
-        $this->setReportOutput($output);
+        // what a Laravel consumer writes: the command already holds an OutputStyle, and
+        // an OutputStyle is an OutputInterface, so there is nothing to adapt
+        $this->setReportOutput($this->getOutput());
 
         $code = ($this->report)($this);
 
@@ -62,12 +52,12 @@ class ReportCommand extends Command
     }
 
     /**
-     * The --only option, typed - InputInterface::getOption() is mixed, being whatever
-     * the definition allows.
+     * The --only option, typed - Command::option() is mixed, being whatever the
+     * definition allows.
      */
     public function onlyOption(): ?string
     {
-        $only = $this->input?->getOption('only');
+        $only = $this->option('only');
 
         return is_string($only) ? $only : null;
     }

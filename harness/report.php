@@ -25,8 +25,11 @@ use Hampel\ConsoleReport\ReportsSettings;
 use Illuminate\Console\Command;
 use Illuminate\Console\OutputStyle;
 use Illuminate\Container\Container;
+use Symfony\Component\Console\Command\Command as SymfonyCommand;
 use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\ConsoleOutput;
+use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * A command shaped like one that would use this package, as the README's examples are.
@@ -55,6 +58,10 @@ class ExampleCommand extends Command
      */
     public function handle(): int
     {
+        // the one line a Laravel consumer adds: the command already holds an OutputStyle,
+        // and an OutputStyle is an OutputInterface, so there is nothing to adapt
+        $this->setReportOutput($this->getOutput());
+
         $code = $this->body->call($this);
 
         return is_int($code) ? $code : self::SUCCESS;
@@ -204,8 +211,48 @@ foreach ($outcomes as $description => $outcome) {
     $io->value('exit code', $run($outcome));
 }
 
+// ---------------------------------------------------------------------------------
+// The same traits from a plain Symfony command - the shape a XenForo add-on has, and
+// the reason there is no illuminate/console in `require` any more. Nothing above this
+// line changes; the only difference is where the output came from.
+// ---------------------------------------------------------------------------------
+
+$io->line();
+$io->info('  the same renderers from a Symfony command, with no Laravel involved');
+
+$symfony = new class () extends SymfonyCommand {
+    use FormatsValues;
+    use RendersChecks;
+    use ReportsSettings;
+
+    protected function execute(InputInterface $input, OutputInterface $output): int
+    {
+        // the one line a Symfony or XenForo consumer adds, in execute() rather than
+        // handle() - Symfony hands the output in, so there is nothing to reach for
+        $this->setReportOutput($output);
+
+        $this->reportSettings([
+            'Add-on' => [
+                'Base Path' => $this->path('phar:///opt/xf/cmd.php'),
+                'Data Path' => $this->path('internal_data/addon'),
+                'API Key' => $this->secretStatus(str_repeat('k', 32)),
+            ],
+        ]);
+
+        $this->checkOk('database', 'reachable');
+        $this->checkWarn('cron', 'has not run in 2 days');
+
+        return $this->checkExitCode();
+    }
+};
+$symfony->setName('xf:report');
+
+$output = new ConsoleOutput();
+$output->setDecorated($io->isDecorated());
+$symfony->run(new ArrayInput([]), $output);
+
 $io->line();
 $io->value('php', PHP_VERSION);
-$io->value('illuminate/console', \Composer\InstalledVersions::getPrettyVersion('illuminate/console'));
 $io->value('symfony/console', \Composer\InstalledVersions::getPrettyVersion('symfony/console'));
+$io->value('illuminate/console', \Composer\InstalledVersions::getPrettyVersion('illuminate/console') . ' (dev only)');
 $io->value('decorated', $io->isDecorated());
