@@ -15,20 +15,21 @@ permissions:
 
 jobs:
   tests:
-    name: PHP ${{ matrix.php }}, Laravel ${{ matrix.laravel }} ${{ matrix.deps }}
+    name: PHP ${{ matrix.php }}, ${{ matrix.name }} ${{ matrix.deps }}
     runs-on: ubuntu-latest
 
     strategy:
       fail-fast: false
-      # The corners of the supported range, not the whole matrix: the platform
-      # floor with the oldest dependencies it claims, the span ceiling, and the
-      # newest platform on the oldest PHP it runs on. Everything between fails
-      # only when a corner does.
+      # The corners of the supported range, not the whole matrix. symfony/console
+      # is the only runtime dependency, so it is the axis that matters: its floor
+      # is what a XenForo 2.3 add-on gets, its ceiling is what a current Laravel
+      # app gets. illuminate/console is a dev dependency and rides the same rows.
       matrix:
         include:
-          - { php: '8.3', laravel: '^12.0', deps: '--prefer-lowest' }
-          - { php: '8.3', laravel: '^13.0', deps: '' }
-          - { php: '8.5', laravel: '^13.0', deps: '' }
+          - { php: '8.3', name: 'Symfony ^5.4, no Laravel', laravel: '', with: 'symfony/console:^5.4', deps: '--prefer-lowest' }
+          - { php: '8.3', name: 'Laravel ^12.0', laravel: '^12.0', with: 'illuminate/console:^12.0', deps: '--prefer-lowest' }
+          - { php: '8.3', name: 'Laravel ^13.0', laravel: '^13.0', with: 'illuminate/console:^13.0', deps: '' }
+          - { php: '8.5', name: 'Laravel ^13.0', laravel: '^13.0', with: 'illuminate/console:^13.0', deps: '' }
 
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -38,19 +39,32 @@ jobs:
           php-version: ${{ matrix.php }}
           coverage: none
 
+      # The floor of the symfony/console range cannot be reached with Laravel installed:
+      # illuminate/console ^12 requires symfony/console ^7, so leaving it in place pins
+      # this corner to 7.x and the 5.4 floor never gets tested at all. Dropping it is
+      # also the strongest statement the suite can make - the package running with no
+      # Laravel anywhere on disk, which is what a XenForo add-on is.
+      - if: matrix.laravel == ''
+        run: composer remove --dev illuminate/console --no-update
+
       # --with, not `composer require`: it constrains within the declared range and
       # refuses to go outside it, so the matrix cannot drift away from composer.json
       # without the job failing. `require` would replace the constraint instead, and a
-      # corner testing a Laravel version the package no longer claims would still pass.
-      - run: composer update --with="illuminate/console:${{ matrix.laravel }}" --prefer-dist --no-progress ${{ matrix.deps }}
+      # corner testing a version the package no longer claims would still pass.
+      - run: composer update --with="${{ matrix.with }}" --prefer-dist --no-progress ${{ matrix.deps }}
 
+      # Two of these skip themselves without illuminate/console - that is the point of
+      # LaravelIntegrationTest, and `Skipped: 2` in that corner's log is the evidence.
       - run: vendor/bin/phpunit
 
-      # Also here, not only in a job of its own: phpstan.neon covers the whole 8.3 - 8.5
-      # PHP range in one pass wherever it runs, but its result still depends on the
-      # dependency tree it resolved against - including phpstan's own version, which is
-      # what the --prefer-lowest corner is for.
-      - run: vendor/bin/phpstan analyse --no-progress
+      # Not on the Laravel-free corner: tests/ is in phpstan.neon's paths because a trait
+      # is only analysed through a class that uses one, and two of those classes are the
+      # Laravel ones. With illuminate/console removed PHPStan cannot resolve them and
+      # reports on the absence rather than on this package. The other three corners cover
+      # it, including a --prefer-lowest one, which is what catches a dependency whose own
+      # version changes the result.
+      - if: matrix.laravel != ''
+        run: vendor/bin/phpstan analyse --no-progress
 
   lint:
     name: Lint
