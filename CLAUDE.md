@@ -100,10 +100,16 @@ question all three can answer, and `writeln()` is the whole of what the renderer
 work, and it was measured: it costs `treatPhpDocTypesAsCertain: false` to stay level-10 clean,
 because Laravel's `getOutput()` is typed only in PHPDoc.
 
-**Names are prefixed to avoid `Illuminate\Console\Command`.** `fail()`, `warn()`, `secret()` and
-`options()` are all public methods on it, and a trait method that collides is a fatal error at class
-declaration, not a test failure. Hence `checkFail()`, `checkWarn()`, `secretStatus()` and
-`redacted()`. **Check any new method name against the parent before adding it.**
+**Names are prefixed to avoid colliding with the parent.** `fail()`, `warn()`, `secret()` and
+`options()` are all public methods on `Illuminate\Console\Command`, and a trait method that collides
+is a fatal error at class declaration, not a test failure. Hence `checkFail()`, `checkWarn()`,
+`secretStatus()` and `redacted()`.
+
+**Check any new method name against `Illuminate\Console\Command` *and*
+`Symfony\Component\Console\Command\Command` before adding it.** Since 2.0 the parent can be either,
+so a name that is safe in Laravel and taken in Symfony breaks every XenForo consumer at class
+declaration. Reflection over both is a two-line script and settles it; all 25 current trait methods
+are clear of both.
 
 **`RendersDetails` exists because `twoColumnDetail` mangles paths.** `render()` runs both columns
 through a fixed mutator chain including `EnsureRelativePaths`, which strips `base_path().'/'` out of
