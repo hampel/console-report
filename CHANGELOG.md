@@ -1,6 +1,18 @@
 CHANGELOG
 =========
 
+Unreleased
+----------
+
+**Breaking:** every command using these traits must now call `setReportOutput($output)` before
+rendering. See "Upgrading from 1.x" in the README.
+
+* dropped `illuminate/console` as a dependency — the package now requires `symfony/console` alone,
+  so plain Symfony Console and XenForo add-on commands can use it as well as Laravel and Laravel Zero
+* `symfony/console` widened to `^5.4|^6.0|^7.0|^8.0`, covering the 5.4 that XenForo 2.3 ships
+* added `WritesReportOutput`, holding the output the renderers write to
+* rendered output is unchanged
+
 1.0.1 (2026-08-20)
 ------------------
 

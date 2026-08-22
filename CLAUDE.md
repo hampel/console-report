@@ -4,13 +4,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-`hampel/console-report` — a Composer library published on Packagist. Four traits that a console
+`hampel/console-report` — a Composer library published on Packagist. Five traits that a console
 command uses to report on itself: a settings dump (`ReportsSettings` over `RendersDetails`, with
-`FormatsValues` for the values) and a validation run (`RendersChecks`).
+`FormatsValues` for the values), a validation run (`RendersChecks`), and `WritesReportOutput`
+underneath both of the renderers.
 
 There is no service provider, no facade, no configuration, and nothing is bound into a container.
-The traits call `$this->line()` and nothing else, so the only requirement on the using class is that
-it is an `Illuminate\Console\Command`.
+**The only thing the traits need from the using class is an `OutputInterface`, handed over with
+`setReportOutput()`** — so the requirement is Symfony Console and nothing more. Laravel, Laravel
+Zero, plain Symfony and XenForo add-on commands are all just consumers of that.
 
 ## Commands
 
@@ -45,20 +47,35 @@ when its values change and quietly stops matching what the renderer emits.
 
 ## Testing
 
-`tests/TestCase.php` runs a real `Illuminate\Console\Command` and hands back what it wrote.
-`ReportCommand` is that command: it uses all four traits and exposes each one through a public
-passthrough, so the tests reach them the way an application would — from inside a command.
+`tests/TestCase.php` runs a real `Symfony\Component\Console\Command` and hands back what it wrote.
+`ReportCommand` is that command: it uses every trait and exposes each one through a public
+passthrough, so the tests reach them the way an application would — from inside a command. The whole
+suite runs against plain Symfony Console, which is what the package asks for.
 
-**No Testbench.** These traits read no configuration and touch no filesystem, so the only part of a
-framework they need is the container `Command::run()` dispatches `handle()` through, and
-`TestContainer` is that container plus the one method `ConfiguresPrompts` asks for
-(`runningUnitTests()`). If a future trait needs config or storage, that is the point to reach for
-Testbench rather than to keep extending the stub.
+**Three contexts, deliberately.** PHPStan analyses a trait only through a class that uses one, so the
+three in `tests/` are what the level-10 run actually checks:
+
+| class | what it pins |
+|---|---|
+| `ReportCommand` | plain Symfony Console — the package's own requirement |
+| `LaravelReportCommand` | `Illuminate\Console\Command`, a dev dependency now |
+| `BareRenderer` | no console framework at all, only `setReportOutput()` |
+
+**No Testbench.** These traits read no configuration and touch no filesystem. `TestContainer` exists
+only for `LaravelReportCommand` — `Illuminate\Console\Command` dispatches `handle()` through a
+container and `ConfiguresPrompts` asks it `runningUnitTests()`. If a future trait needs config or
+storage, that is the point to reach for Testbench rather than to keep extending the stub.
+
+**`LaravelIntegrationTest` skips itself when `illuminate/console` is absent**, which is not defensive
+padding: one CI corner removes it so that the floor of the `symfony/console` range can be resolved at
+all. `Skipped: 2` in that job's log is the evidence the corner did what it claims.
 
 **No larastan either.** It bootstraps a Laravel application to read `LARAVEL_VERSION` and there is
 none here, so PHPStan aborts before analysing anything. It also wants `illuminate/database` and 26
 other packages in order to reason about Eloquent and facades, none of which this package uses —
-`src` imports only `Symfony\Component\Console\Terminal` and Symfony's `Command`.
+`src` imports only `Symfony\Component\Console\Terminal`, Symfony's `Command` and `OutputInterface`.
+That list is worth re-checking after any change to `src`: it is the shortest statement of what this
+package actually depends on, and `composer.json` should agree with it.
 
 Two things to know before adding tests:
 
@@ -70,10 +87,18 @@ Two things to know before adding tests:
 
 ## Architecture
 
-**Traits, not a base class.** Consumers are Laravel Zero applications whose commands already extend
-`LaravelZero\Framework\Commands\Command`; a base class in this package would take that away from
-them. It also lets a command use only the parts it wants — a validation command has no use for the
-settings machinery.
+**Traits, not a base class.** Consumers already extend something — `LaravelZero\Framework\Commands\Command`,
+`XF\Cli\Command\AbstractCommand`, `Symfony\Component\Console\Command\Command` — and a base class here
+would take that away from them. It also lets a command use only the parts it wants — a validation
+command has no use for the settings machinery.
+
+**One seam, and it is an `OutputInterface`.** The console frameworks disagree about where a command's
+output lives: Symfony passes it into `execute()`, Laravel keeps it on the command behind `line()`,
+XenForo builds a `SymfonyStyle` inside each command. Asking for the output outright is the only
+question all three can answer, and `writeln()` is the whole of what the renderers need. That is why
+`setReportOutput()` is a call the consumer makes rather than something sniffed for — a sniff would
+work, and it was measured: it costs `treatPhpDocTypesAsCertain: false` to stay level-10 clean,
+because Laravel's `getOutput()` is typed only in PHPDoc.
 
 **Names are prefixed to avoid `Illuminate\Console\Command`.** `fail()`, `warn()`, `secret()` and
 `options()` are all public methods on it, and a trait method that collides is a fatal error at class
@@ -98,14 +123,26 @@ fifth outcome, or making a warning exit non-zero, changes behaviour in every con
 
 ## Version support
 
-PHP 8.3 through 8.5, and `illuminate/console` `^12|^13`. Both are deliberate policy rather than
-whatever happened to resolve: `composer.json` is the source of truth, and neither constraint should
-be widened or narrowed casually, since dropping a supported version after release is a major.
+PHP 8.3 through 8.5, and `symfony/console` `^5.4|^6.0|^7.0|^8.0` — the only runtime dependency.
+Both are deliberate policy rather than whatever happened to resolve: `composer.json` is the source of
+truth, and neither constraint should be widened or narrowed casually, since dropping a supported
+version after release is a major.
 
-CI tests the three corners of that range rather than the whole matrix — platform floor with
-`--prefer-lowest`, span ceiling, and newest platform on the oldest PHP — and PHPStan analyses the
-whole 8.3-8.5 PHP range in one pass. Keep `phpstan.neon`'s `phpVersion` and the CI matrix in step
-with the constraints in `composer.json`.
+**The 5.4 floor is there for XenForo**, which ships Symfony Console 5.4 in XF 2.3 and cannot use a
+package that demands 7.x. `illuminate/console` `^12|^13` is a dev dependency, exercised by
+`LaravelIntegrationTest` and by three of the four CI corners.
+
+CI tests the corners of that range rather than the whole matrix — the `symfony/console` floor with
+`--prefer-lowest` and no Laravel installed, the Laravel floor with `--prefer-lowest`, the span
+ceiling, and the newest platform on the oldest PHP — and PHPStan analyses the whole 8.3-8.5 PHP range
+in one pass. Keep `phpstan.neon`'s `phpVersion` and the CI matrix in step with `composer.json`.
+
+**Symfony's own deprecations bound where a corner can run.** Early patches of each Symfony line emit
+PHP 8.4 implicit-nullable deprecations, and `phpunit.xml` sets `failOnDeprecation`, so the suite goes
+red on them even though they come from `vendor/symfony`. Measured on PHP 8.5: 5.4.34 emits them and
+5.4.35 does not; 6.4.0 emits them and 6.4.10 does not; 7.0.0 emits them and 7.1.0 does not. All of
+those are clean on PHP 8.3, which is why the `--prefer-lowest` corners run there and only the ceiling
+corner runs on 8.5. Widening the constraint downwards again means re-measuring this.
 
 ## Conventions
 

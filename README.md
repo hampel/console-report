@@ -21,8 +21,37 @@ Installation
 
 `composer require hampel/console-report`
 
-Requires PHP 8.3 or later, and Laravel 12 or 13 (`illuminate/console`). Works the same in
-[Laravel Zero](https://laravel-zero.com), which is what it was written for.
+Requires PHP 8.3 or later and Symfony Console 5.4 or later — and nothing else. Any console
+framework built on Symfony Console can use it:
+[Laravel](https://laravel.com) and [Laravel Zero](https://laravel-zero.com), which is what it was
+written for, plain [Symfony Console](https://symfony.com/doc/current/components/console.html), and
+[XenForo](https://xenforo.com) add-on commands.
+
+Giving it somewhere to write
+----------------------------
+
+The traits render into a `Symfony\Component\Console\Output\OutputInterface`, and they need to be
+handed one before they are asked to render anything. That is the whole of the integration, and it is
+a single line wherever your framework keeps its output:
+
+```php
+// Symfony Console, and XenForo add-on commands, which are Symfony commands
+protected function execute(InputInterface $input, OutputInterface $output): int
+{
+    $this->setReportOutput($output);
+    ...
+}
+
+// Laravel and Laravel Zero - an OutputStyle is an OutputInterface, so it goes straight in
+public function handle(): int
+{
+    $this->setReportOutput($this->getOutput());
+    ...
+}
+```
+
+Forget it and the first render throws a `LogicException` saying so, rather than failing somewhere
+less obvious.
 
 Why not `twoColumnDetail`
 -------------------------
@@ -64,6 +93,8 @@ class Config extends Command
 
     public function handle(): int
     {
+        $this->setReportOutput($this->getOutput());
+
         $this->reportSettings([
             'Application' => [
                 'Version' => $this->app->version(),
@@ -126,15 +157,21 @@ Reporting checks
 describing it — the one you run after provisioning a server, and the first one you run when
 something has gone quiet:
 
+This one is written as a Symfony command — a XenForo add-on command has exactly this shape — to show
+the other half of the wiring. The trait methods are identical either way:
+
 ```php
 use Hampel\ConsoleReport\RendersChecks;
+use Symfony\Component\Console\Command\Command;
 
 class Validate extends Command
 {
     use RendersChecks;
 
-    public function handle(): int
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $this->setReportOutput($output);
+
         $this->checkOk('rclone', '/usr/bin/rclone v1.60.1');
         $this->checkWarn('cloud remote', 'does not exist yet - it will be created on first transfer');
         $this->checkFail('mysqldump', 'not found on PATH');
@@ -171,6 +208,23 @@ Lines fill the terminal width, up to `$detailMaxWidth` (150 by default) — beyo
 follow a row of dots back to its label. A value too long to fit **wraps to its own line rather than
 being truncated**, because a truncated path is worth less than nothing: it still looks like a path,
 and it is not one. Console markup is not counted when measuring, so a coloured value still lines up.
+
+`WritesReportOutput` sits under both renderers and holds the output you handed over. You never need
+to `use` it directly — `RendersDetails` and `RendersChecks` already do — but `setReportOutput()` and
+the protected `reportLine()` come from there.
+
+Upgrading from 1.x
+------------------
+
+**2.0 drops `illuminate/console`.** The renderers only ever called `line()` and `newLine()` on it,
+which are `writeln()` on the command's own output, so the package now asks for that output directly
+and requires Symfony Console alone. Laravel and Laravel Zero are unaffected as consumers — they are
+built on Symfony Console — and the rendered output is byte-for-byte what it was.
+
+One change is needed in each command that uses these traits: **call `setReportOutput()` before
+rendering**, as shown in [Giving it somewhere to write](#giving-it-somewhere-to-write). In a Laravel
+command that is `$this->setReportOutput($this->getOutput());` at the top of `handle()`. Nothing else
+moved — every trait, method and behaviour is otherwise unchanged.
 
 License
 -------
