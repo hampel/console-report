@@ -1,8 +1,8 @@
 CHANGELOG
 =========
 
-Unreleased
-----------
+2.0.0 (2026-08-22)
+------------------
 
 **Breaking:** every command using these traits must now call `setReportOutput($output)` before
 rendering. See "Upgrading from 1.x" in the README.
