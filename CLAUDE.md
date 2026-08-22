@@ -45,6 +45,17 @@ every assertion in `tests/` sees `<fg=yellow>` as a literal tag and never as a c
 half of the exercise pins, so regenerate rather than hand-edit them — a pasted block gets adjusted
 when its values change and quietly stops matching what the renderer emits.
 
+**This harness has no delivery guards, and their absence is deliberate rather than an oversight.**
+The pattern a rig harness normally carries — a sink default, an `X_DELIVER` opt-in, and an
+`X_AGENT_MAY_DELIVER` override that a stale `.env` cannot fake — exists because an exercise usually
+does the real thing: it posts the message, calls the API, sends the mail. This one writes lines to a
+terminal. There is no external effect to withhold, no credential to read, and so no switch to name.
+Running it twice by accident costs nothing but scrollback.
+
+`hampel/rig` is required at `^0.2` all the same. 0.2.0 withholds the package's `.env` from an agent
+session, which is the one layer that protects a harness whose author never considered any of this —
+including a future one here. It is currently a silent no-op, since there is no `.env` to withhold.
+
 ## Testing
 
 `tests/TestCase.php` runs a real `Symfony\Component\Console\Command` and hands back what it wrote.
