@@ -1,12 +1,17 @@
 CHANGELOG
 =========
 
-Unreleased
-----------
+2.1.0 (2026-08-28)
+------------------
+
+Additive: nothing already written renders differently, and only the first item below reaches a
+consumer at all.
 
 * added `RendersChecks::checkSection($title)` — a heading above a run of check rows, drawn the same
   way `reportSettings()` introduces a section, so a command reporting settings and then checking
-  them speaks one visual language. Optional; nothing already written renders differently
+  them speaks one visual language. It draws no rule under the title: a rule has to be measured, and
+  that is what hand-rolled versions of this get wrong, ruling with `strlen()` so a title with an
+  accent in it is underlined too far
 * CI now runs `composer-require-checker` against a `--no-dev` install, so a symbol `src` uses
   without `require` naming it fails the build. `symfony/console` brings `symfony/string` and the
   polyfills along with it, and a class from any of them would have resolved everywhere and been
