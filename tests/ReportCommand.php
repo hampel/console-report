@@ -90,6 +90,11 @@ class ReportCommand extends Command
         $this->heading($heading);
     }
 
+    public function showSection(string $title): void
+    {
+        $this->checkSection($title);
+    }
+
     public function showOk(string $label, string $detail = ''): void
     {
         $this->checkOk($label, $detail);

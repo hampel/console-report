@@ -34,6 +34,25 @@ trait RendersChecks
 
     protected bool $checkWarned = false;
 
+    /**
+     * A heading above a run of check rows, with a blank line before it.
+     *
+     * The same green as RendersDetails::heading(), and introduced the same way that
+     * reportSettings() introduces a section - a blank line, then the heading - so a
+     * command that reports its settings and then checks them speaks one visual language
+     * throughout. It draws no rule under the title: the blank line and the weight of the
+     * colour are the break, and a rule would have to be measured, which is where the two
+     * hand-rolled copies this replaces went wrong (both ruled with strlen(), so a title
+     * with any multibyte character in it was underlined too far).
+     *
+     * Optional, and a report that runs its checks in one undivided list needs nothing here.
+     */
+    protected function checkSection(string $title): void
+    {
+        $this->reportLine();
+        $this->reportLine("  <fg=green;options=bold>{$title}</>");
+    }
+
     protected function checkOk(string $label, string $detail = ''): void
     {
         $this->checkResult('<info>[ ok ]</info>', $label, $detail);

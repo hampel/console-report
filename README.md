@@ -193,6 +193,36 @@ Four outcomes, because the distinctions matter to someone reading this mid-incid
 is something to know about that does not stop the tool working, and a **skip** is a check that had
 nothing to say, which is not the same as one that passed.
 
+`checkSection($title)` divides a long run of checks into named groups — a blank line, then the title
+in the same green `heading()` uses, so a command that reports its settings and then checks them
+speaks one visual language throughout:
+
+```php
+$this->checkSection('Binaries');
+$this->checkOk('rclone', '/usr/bin/rclone v1.60.1');
+$this->checkFail('mysqldump', 'not found on PATH');
+
+$this->checkSection('Cloud');
+$this->checkOk('credentials', 'accepted');
+$this->checkWarn('remote', 'does not exist yet');
+```
+
+```
+
+  Binaries
+  [ ok ] rclone                   /usr/bin/rclone v1.60.1
+  [fail] mysqldump                not found on PATH
+
+  Cloud
+  [ ok ] credentials              accepted
+  [warn] remote                   does not exist yet
+```
+
+It draws no rule under the title. The blank line and the weight of the colour are the break, and a
+rule would have to be measured — which is the one thing hand-rolled versions of this reliably get
+wrong, ruling with `strlen()` so that a title with an accent in it is underlined too far. Sections
+are optional; a report that runs its checks in one undivided list needs nothing here.
+
 `checkExitCode()` returns failure if any check failed and success otherwise — a warning is not a
 failure — which is what makes the command usable as a post-deploy check. `checksFailed()` and
 `checksWarned()` are there if you want to say something else at the end. Set `$checkLabelWidth` to

@@ -7,7 +7,7 @@
  * tells you nothing about whether the result reads well - and reading well mid-incident
  * is the entire design brief. This renders the real thing, in colour, so you can judge it.
  *
- * It is also where the README's two output blocks come from. They are quoted at
+ * It is also where the README's three output blocks come from. They are quoted at
  * COLUMNS=80 and must be generated rather than trusted, so the first half of this
  * exercise reproduces them exactly; copy from here when they change.
  *
@@ -137,6 +137,22 @@ $run(function () {
     $this->checkFail('mysqldump', 'not found on PATH');
     $this->checkSkip('sync', 'nothing configured');
 });
+
+$io->line();
+$io->info('  checkSection - the same rows, divided - the README block');
+$io->line();
+
+$run(function () {
+    $this->checkSection('Binaries');
+    $this->checkOk('rclone', '/usr/bin/rclone v1.60.1');
+    $this->checkFail('mysqldump', 'not found on PATH');
+
+    $this->checkSection('Cloud');
+    $this->checkOk('credentials', 'accepted');
+    $this->checkWarn('remote', 'does not exist yet');
+});
+
+$io->line();
 
 // ---------------------------------------------------------------------------------
 // Everything the README has no room for, at whatever width you are actually reading at.

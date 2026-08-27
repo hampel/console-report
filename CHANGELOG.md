@@ -4,8 +4,9 @@ CHANGELOG
 Unreleased
 ----------
 
-Nothing here reaches the published archive — the package's own code is unchanged since 2.0.0.
-
+* added `RendersChecks::checkSection($title)` — a heading above a run of check rows, drawn the same
+  way `reportSettings()` introduces a section, so a command reporting settings and then checking
+  them speaks one visual language. Optional; nothing already written renders differently
 * CI now runs `composer-require-checker` against a `--no-dev` install, so a symbol `src` uses
   without `require` naming it fails the build. `symfony/console` brings `symfony/string` and the
   polyfills along with it, and a class from any of them would have resolved everywhere and been

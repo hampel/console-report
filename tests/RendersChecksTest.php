@@ -28,6 +28,34 @@ class RendersChecksTest extends TestCase
         ], $this->lines($output));
     }
 
+    public function testItPutsASectionHeadingAboveTheRowsItIntroduces(): void
+    {
+        // a blank line then the heading - the same rhythm reportSettings() uses between
+        // its own sections, so a command doing both does not change visual language
+        $output = $this->render(function (ReportCommand $command) {
+            $command->showOk('rclone', 'found');
+            $command->showSection('Cloud');
+            $command->showOk('remote', 'reachable');
+        });
+
+        $this->assertSame([
+            '  [ ok ] rclone                   found',
+            '',
+            '  Cloud',
+            '  [ ok ] remote                   reachable',
+        ], $this->lines($output));
+    }
+
+    public function testItDoesNotRuleUnderASectionHeading(): void
+    {
+        // the two hand-rolled copies this replaces underlined with strlen(), so a title
+        // with any multibyte character in it was ruled one column too far per character.
+        // There is no rule here, so there is nothing to measure and nothing to get wrong
+        $output = $this->render(fn (ReportCommand $command) => $command->showSection('Réseau'));
+
+        $this->assertSame(['', '  Réseau'], $this->lines($output));
+    }
+
     public function testItLinesUpTheDetailColumnAtAWidthTheCommandChooses(): void
     {
         $output = $this->render(function (ReportCommand $command) {

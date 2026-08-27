@@ -55,7 +55,7 @@ returns no verdict — and it is not run by CI. It is there because whether outp
 whole design brief and is not a thing the suite can tell you: `BufferedOutput` is undecorated, so
 every assertion in `tests/` sees `<fg=yellow>` as a literal tag and never as a colour.
 
-**The README's two output blocks come from here.** They are quoted at `COLUMNS=80`, which the first
+**The README's three output blocks come from here.** They are quoted at `COLUMNS=80`, which the first
 half of the exercise pins, so regenerate rather than hand-edit them — a pasted block gets adjusted
 when its values change and quietly stops matching what the renderer emits.
 
@@ -140,7 +140,7 @@ is a fatal error at class declaration, not a test failure. Hence `checkFail()`, 
 **Check any new method name against `Illuminate\Console\Command` *and*
 `Symfony\Component\Console\Command\Command` before adding it.** Since 2.0 the parent can be either,
 so a name that is safe in Laravel and taken in Symfony breaks every XenForo consumer at class
-declaration. Reflection over both is a two-line script and settles it; all 25 current trait methods
+declaration. Reflection over both is a two-line script and settles it; all 26 current trait methods
 are clear of both.
 
 **`RendersDetails` exists because `twoColumnDetail` mangles paths.** `render()` runs both columns
