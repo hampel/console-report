@@ -66,6 +66,58 @@ jobs:
       - if: matrix.laravel != ''
         run: vendor/bin/phpstan analyse --no-progress
 
+  dependencies:
+    name: Declared dependencies
+    runs-on: ubuntu-latest
+
+    # Does src/ need anything that "require" does not name? Neither PHPStan run
+    # answers that: both have the dev dependencies installed and see nothing
+    # wrong, and the package would fatal for the consumer instead.
+    #
+    # symfony/console is the live risk. Its own tree brings symfony/string, the
+    # polyfills and service-contracts along with it, and every class in all of
+    # them resolves in a consumer install as readily as in a dev one - so an
+    # undeclared Symfony\Component\String\... import would look entirely at
+    # home and break nobody until Symfony reshuffles its packages. The other
+    # half is illuminate/console, which is dev-only and must stay out of src/.
+    #
+    # Note what this cannot see: the 2.0 audit found src/ calling Symfony
+    # Console while composer.json declared only illuminate/console, and no tool
+    # here would have caught it - that dependency was behavioural ($this->line())
+    # and referenced no symbol at all. This job covers symbols, nothing more.
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
+        with:
+          php-version: '8.3'
+          extensions: mbstring
+          coverage: none
+
+      # The dev dependencies have to be gone: the checker judges src/ against
+      # the closure a consumer actually gets, and this install is that closure.
+      - run: composer install --no-dev --prefer-dist --no-progress
+
+      # The checker is itself a dev dependency, so --no-dev just deleted it, and
+      # it has to come from outside the package. composer -d does not create the
+      # directory, so mkdir first or the step dies with "Invalid working
+      # directory specified".
+      - run: |
+          mkdir -p /tmp/crc
+          composer -d /tmp/crc require maglnet/composer-require-checker --no-progress
+
+      - run: /tmp/crc/vendor/bin/composer-require-checker check composer.json
+
+      # No dev-free PHPStan step here, unlike the sibling packages that pair one
+      # with this. src/ is nothing but traits, and PHPStan does not analyse a
+      # trait that no analysed class uses - so pointing it at src/ with the dev
+      # dependencies gone reports "No errors" over a body it never read. Measured:
+      # an Illuminate\Support\Str call planted in a trait passes, the same call
+      # in a plain class in src/ is caught. The checker reads the file itself and
+      # has no such blind spot, and it is the stronger check anyway - it fails on
+      # a symbol that resolves but is not in "require", which PHPStan cannot.
+
   lint:
     name: Lint
     runs-on: ubuntu-latest

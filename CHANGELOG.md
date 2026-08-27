@@ -1,6 +1,17 @@
 CHANGELOG
 =========
 
+Unreleased
+----------
+
+Nothing here reaches the published archive — the package's own code is unchanged since 2.0.0.
+
+* CI now runs `composer-require-checker` against a `--no-dev` install, so a symbol `src` uses
+  without `require` naming it fails the build. `symfony/console` brings `symfony/string` and the
+  polyfills along with it, and a class from any of them would have resolved everywhere and been
+  caught by nothing
+* `hampel/rig` raised to `^1.1`, and the harness footer grouped with the `Io::values()` it adds
+
 2.0.0 (2026-08-22)
 ------------------
 

@@ -24,9 +24,23 @@ vendor/bin/phpunit tests/FormatsValuesTest.php  # single file
 php8.5 vendor/bin/phpunit                       # ceiling of the supported range
 ```
 
-`composer check` runs Pint, PHPStan and the suite — the same three things CI runs, so a green check
-locally means a green build. Individually: `composer lint` (Pint, no writes), `composer format`
-(Pint, writing), `composer analyse`, `composer test`.
+`composer check` runs Pint, PHPStan and the suite. Individually: `composer lint` (Pint, no writes),
+`composer format` (Pint, writing), `composer analyse`, `composer test`.
+
+CI runs one thing `composer check` does not: `composer-require-checker`, which asks whether `src`
+uses any symbol that `require` does not name. It is not a dev dependency here — it would be
+installed by every contributor to be run about once a release — so run it by hand when `src` gains
+an import:
+
+```bash
+composer -d /tmp/crc require maglnet/composer-require-checker
+/tmp/crc/vendor/bin/composer-require-checker check composer.json
+```
+
+A dev install does not hide a finding from it: its known-symbol list comes from `require`, so a
+`Illuminate\Support\Str` or `Symfony\Component\String\…` reference in `src` is reported with
+the whole dev tree on disk. CI installs `--no-dev` anyway, because that closure is what a consumer
+actually gets.
 
 ## Looking at the output
 
@@ -71,6 +85,13 @@ three in `tests/` are what the level-10 run actually checks:
 | `ReportCommand` | plain Symfony Console — the package's own requirement |
 | `LaravelReportCommand` | `Illuminate\Console\Command`, a dev dependency now |
 | `BareRenderer` | no console framework at all, only `setReportOutput()` |
+
+That is not only a level-10 concern. PHPStan does not merely infer less about an unused trait — it
+skips the body entirely, and reports `No errors` over code it never read. So the dev-free PHPStan
+job that the sibling packages pair with `composer-require-checker` is a no-op here and is
+deliberately absent from `.github/workflows/tests.yml`; measured, an `Illuminate\Support\Str` call
+planted in a trait passes and the same call in a plain class under `src` is caught. Anything that
+wants to check `src` with `tests/` out of reach has to read the files itself.
 
 **No Testbench.** These traits read no configuration and touch no filesystem. `TestContainer` exists
 only for `LaravelReportCommand` — `Illuminate\Console\Command` dispatches `handle()` through a
