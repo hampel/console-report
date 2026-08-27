@@ -52,7 +52,7 @@ does the real thing: it posts the message, calls the API, sends the mail. This o
 terminal. There is no external effect to withhold, no credential to read, and so no switch to name.
 Running it twice by accident costs nothing but scrollback.
 
-`hampel/rig` is required at `^0.2` all the same. 0.2.0 withholds the package's `.env` from an agent
+`hampel/rig` is required at `^1.0` all the same. Rig withholds the package's `.env` from an agent
 session, which is the one layer that protects a harness whose author never considered any of this —
 including a future one here. It is currently a silent no-op, since there is no `.env` to withhold.
 
