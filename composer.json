@@ -28,7 +28,7 @@
         "symfony/console": "^5.4|^6.0|^7.0|^8.0"
     },
     "require-dev": {
-        "hampel/rig": "^1.0",
+        "hampel/rig": "^1.1",
         "illuminate/console": "^12.0|^13.0",
         "laravel/pint": "^1.30",
         "phpstan/phpstan": "^2.1.22",

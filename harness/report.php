@@ -252,7 +252,9 @@ $output->setDecorated($io->isDecorated());
 $symfony->run(new ArrayInput([]), $output);
 
 $io->line();
-$io->value('php', PHP_VERSION);
-$io->value('symfony/console', \Composer\InstalledVersions::getPrettyVersion('symfony/console'));
-$io->value('illuminate/console', \Composer\InstalledVersions::getPrettyVersion('illuminate/console') . ' (dev only)');
-$io->value('decorated', $io->isDecorated());
+$io->values([
+    'php' => PHP_VERSION,
+    'symfony/console' => \Composer\InstalledVersions::getPrettyVersion('symfony/console'),
+    'illuminate/console' => \Composer\InstalledVersions::getPrettyVersion('illuminate/console') . ' (dev only)',
+    'decorated' => $io->isDecorated(),
+]);
