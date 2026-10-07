@@ -112,6 +112,44 @@ class RendersChecksTest extends TestCase
         $this->assertSame(Command::SUCCESS, $code);
     }
 
+    public function testItExitsTwoForAWarningOnlyWhenAskedToBeStrict(): void
+    {
+        $code = $this->runReport(function (ReportCommand $command) {
+            $command->showOk('rclone');
+            $command->showWarn('remote', 'does not exist yet');
+
+            return $command->outcome(strict: true);
+        });
+
+        $this->assertSame(2, $code);
+    }
+
+    public function testItStillExitsOneForAFailureWhenStrict(): void
+    {
+        // strict adds a third state; it does not renumber the other two, so 1 means
+        // failed with the flag and without it
+        $code = $this->runReport(function (ReportCommand $command) {
+            $command->showWarn('remote', 'does not exist yet');
+            $command->showFail('mysqldump', 'not found');
+
+            return $command->outcome(strict: true);
+        });
+
+        $this->assertSame(Command::FAILURE, $code);
+    }
+
+    public function testItExitsZeroWhenStrictFindsNothingToWarnAbout(): void
+    {
+        $code = $this->runReport(function (ReportCommand $command) {
+            $command->showOk('rclone');
+            $command->showSkip('sync', 'nothing configured');
+
+            return $command->outcome(strict: true);
+        });
+
+        $this->assertSame(Command::SUCCESS, $code);
+    }
+
     public function testItRemembersWhatItSaw(): void
     {
         $this->runReport(function (ReportCommand $command) {

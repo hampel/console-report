@@ -228,6 +228,22 @@ failure — which is what makes the command usable as a post-deploy check. `chec
 `checksWarned()` are there if you want to say something else at the end. Set `$checkLabelWidth` to
 line the detail column up with the longest label in your run.
 
+`checkExitCode(strict: true)` is for a caller that does want to hear about a warning — a monitor
+rather than a deployment gate. A run that warned and did not fail then exits 2:
+
+| | all fine | warnings only | any failure |
+|---|---|---|---|
+| `checkExitCode()` | 0 | 0 | 1 |
+| `checkExitCode(strict: true)` | 0 | 2 | 1 |
+
+Failure is 1 either way, so this is **not** the monitoring-plugin numbering, where 1 is the warning
+and 2 is critical. Wire it to an option called `--strict`, which changes the exit code and nothing
+else:
+
+```php
+return $this->checkExitCode((bool) $input->getOption('strict'));
+```
+
 Drawing the lines
 -----------------
 

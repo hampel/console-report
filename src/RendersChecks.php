@@ -105,9 +105,19 @@ trait RendersChecks
 
     /**
      * Failure if any check failed, success otherwise - a warning is not a failure.
+     *
+     * Strict is for a caller that wants to hear about a warning too, a monitor rather than
+     * a deployment gate: a run that warned and did not fail then exits 2. Failure is still
+     * 1, so this is not the monitoring-plugin numbering, where 1 is the warning - a command
+     * offering it should call the option --strict and not anything that suggests otherwise.
      */
-    protected function checkExitCode(): int
+    protected function checkExitCode(bool $strict = false): int
     {
-        return $this->checkFailed ? Command::FAILURE : Command::SUCCESS;
+        if ($this->checkFailed) {
+            return Command::FAILURE;
+        }
+
+        // a literal: Symfony's name for 2 is Command::INVALID, which means bad usage
+        return $strict && $this->checkWarned ? 2 : Command::SUCCESS;
     }
 }

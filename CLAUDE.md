@@ -157,7 +157,13 @@ blank marker mean the same thing in every tool that uses this, because the perso
 reading them mid-incident: a warning does not stop the tool working, and a skip is a check that had
 nothing to say rather than one that passed. `checkExitCode()` follows from that — only a failure
 exits non-zero — which is what makes a validation command usable as a post-deploy gate. Adding a
-fifth outcome, or making a warning exit non-zero, changes behaviour in every consumer at once.
+fifth outcome, or making a warning exit non-zero by default, changes behaviour in every consumer at
+once.
+
+**`checkExitCode(strict: true)` is the opt-in, and it adds a state without renumbering one.** A run
+that warned and did not fail exits 2; a failure is still 1. That is deliberately not the
+monitoring-plugin numbering, where 1 is the warning — exit 1 has to mean "failed" with the flag and
+without it, in every tool, or a script reading it has to know how the command was invoked.
 
 ## Version support
 

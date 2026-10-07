@@ -219,6 +219,17 @@ $outcomes = [
 
         return $this->checkExitCode();
     },
+    'one warned, strict' => function () {
+        $this->checkWarn('cloud remote', 'will be created on first transfer');
+
+        return $this->checkExitCode(strict: true);
+    },
+    'one warned and one failed, strict' => function () {
+        $this->checkWarn('cloud remote', 'will be created on first transfer');
+        $this->checkFail('mysqldump', 'not found on PATH');
+
+        return $this->checkExitCode(strict: true);
+    },
 ];
 
 foreach ($outcomes as $description => $outcome) {

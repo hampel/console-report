@@ -1,6 +1,15 @@
 CHANGELOG
 =========
 
+Unreleased
+----------
+
+Additive: `checkExitCode()` called with no argument behaves exactly as before.
+
+* added a `$strict` argument to `RendersChecks::checkExitCode()` — with it, a run that warned and
+  did not fail exits 2, for a caller that wants to hear about a warning as well as a failure.
+  Failure is 1 either way, so this is not the monitoring-plugin numbering; the README has the table
+
 2.1.0 (2026-08-28)
 ------------------
 

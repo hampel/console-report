@@ -125,9 +125,9 @@ class LaravelReportCommand extends Command
         return $this->redacted($value);
     }
 
-    public function outcome(): int
+    public function outcome(bool $strict = false): int
     {
-        return $this->checkExitCode();
+        return $this->checkExitCode($strict);
     }
 
     public function hasWarned(): bool
