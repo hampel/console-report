@@ -1,8 +1,6 @@
-CHANGELOG
-=========
+# CHANGELOG
 
-Unreleased
-----------
+## Unreleased
 
 Additive: `checkExitCode()` called with no argument behaves exactly as before.
 
@@ -10,8 +8,7 @@ Additive: `checkExitCode()` called with no argument behaves exactly as before.
   did not fail exits 2, for a caller that wants to hear about a warning as well as a failure.
   Failure is 1 either way, so this is not the monitoring-plugin numbering; the README has the table
 
-2.1.0 (2026-08-28)
-------------------
+## 2.1.0 (2026-08-28)
 
 Additive: nothing already written renders differently, and only the first item below reaches a
 consumer at all.
@@ -27,8 +24,7 @@ consumer at all.
   caught by nothing
 * `hampel/rig` raised to `^1.1`, and the harness footer grouped with the `Io::values()` it adds
 
-2.0.0 (2026-08-22)
-------------------
+## 2.0.0 (2026-08-22)
 
 **Breaking:** every command using these traits must now call `setReportOutput($output)` before
 rendering. See "Upgrading from 1.x" in the README.
@@ -39,8 +35,7 @@ rendering. See "Upgrading from 1.x" in the README.
 * added `WritesReportOutput`, holding the output the renderers write to
 * rendered output is unchanged
 
-1.0.1 (2026-08-20)
-------------------
+## 1.0.1 (2026-08-20)
 
 * fixed `path()` reporting a stream wrapper URI as relative — inside a built phar,
   `phar:///opt/bin/tool` was printed as being relative to the working directory
@@ -48,8 +43,7 @@ rendering. See "Upgrading from 1.x" in the README.
 * `phpstan/phpstan` requires `^2.1.22`
 * added a harness for looking at the rendered output, run with `vendor/bin/rig`
 
-1.0.0 (2026-08-19)
-------------------
+## 1.0.0 (2026-08-19)
 
 First release.
 

@@ -1,5 +1,4 @@
-Console Report
-==============
+# Console Report
 
 [![Tests](https://github.com/hampel/console-report/actions/workflows/tests.yml/badge.svg)](https://github.com/hampel/console-report/actions/workflows/tests.yml)
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/hampel/console-report.svg?style=flat-square)](https://packagist.org/packages/hampel/console-report)
@@ -16,8 +15,7 @@ Both kinds of output are read by someone who is either installing a tool or in t
 incident with it, which sets the whole standard: **a value is either shown as it is or said to be
 missing, and it is never quietly rewritten**.
 
-Installation
-------------
+## Installation
 
 `composer require hampel/console-report`
 
@@ -27,8 +25,7 @@ framework built on Symfony Console can use it:
 written for, plain [Symfony Console](https://symfony.com/doc/current/components/console.html), and
 [XenForo](https://xenforo.com) add-on commands.
 
-Giving it somewhere to write
-----------------------------
+## Giving it somewhere to write
 
 The traits render into a `Symfony\Component\Console\Output\OutputInterface`, and they need to be
 handed one before they are asked to render anything. That is the whole of the integration, and it is
@@ -53,8 +50,7 @@ public function handle(): int
 Forget it and the first render throws a `LogicException` saying so, rather than failing somewhere
 less obvious.
 
-Why not `twoColumnDetail`
--------------------------
+## Why not `twoColumnDetail`
 
 Laravel ships this shape already, as `$this->components->twoColumnDetail()`, and it cannot be used
 for anything holding a path. `render()` puts both of its columns through a fixed mutator chain
@@ -73,8 +69,7 @@ this actually reading* is the entire question being asked, and those read as pla
 paths, so nothing looks wrong. Worse, a path outside the application directory is left alone, so the
 output is inconsistent with no hint that anything was touched.
 
-Reporting settings
-------------------
+## Reporting settings
 
 `ReportsSettings` takes sections of label-value pairs and renders them, optionally filtered to the
 sections named on the command line:
@@ -150,8 +145,7 @@ no working directory to resolve against.
 whose names contain `pass`, `secret` or `token`) rather than every conceivable one. Credentials
 belong in a defaults file the binary reads for itself; this is a backstop for when they are not.
 
-Reporting checks
-----------------
+## Reporting checks
 
 `RendersChecks` is the counterpart for a command that exercises an installation rather than
 describing it — the one you run after provisioning a server, and the first one you run when
@@ -244,8 +238,7 @@ else:
 return $this->checkExitCode((bool) $input->getOption('strict'));
 ```
 
-Drawing the lines
------------------
+## Drawing the lines
 
 `RendersDetails` is the primitive underneath `ReportsSettings`, if you want the dotted line
 somewhere else: `detail($label, $value)` and `heading($section)`.
@@ -259,8 +252,7 @@ and it is not one. Console markup is not counted when measuring, so a coloured v
 to `use` it directly — `RendersDetails` and `RendersChecks` already do — but `setReportOutput()` and
 the protected `reportLine()` come from there.
 
-Upgrading from 1.x
-------------------
+## Upgrading from 1.x
 
 **2.0 drops `illuminate/console`.** The renderers only ever called `line()` and `newLine()` on it,
 which are `writeln()` on the command's own output, so the package now asks for that output directly
@@ -272,7 +264,6 @@ rendering**, as shown in [Giving it somewhere to write](#giving-it-somewhere-to-
 command that is `$this->setReportOutput($this->getOutput());` at the top of `handle()`. Nothing else
 moved — every trait, method and behaviour is otherwise unchanged.
 
-License
--------
+## License
 
 MIT. See [LICENSE.md](LICENSE.md).
