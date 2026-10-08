@@ -94,20 +94,15 @@ jobs:
           php-version: '8.3'
           extensions: mbstring
           coverage: none
+          # The checker has to come from outside the package: it would be a dev
+          # dependency, and the install below is the one that leaves those out.
+          tools: composer-require-checker
 
       # The dev dependencies have to be gone: the checker judges src/ against
       # the closure a consumer actually gets, and this install is that closure.
       - run: composer install --no-dev --prefer-dist --no-progress
 
-      # The checker is itself a dev dependency, so --no-dev just deleted it, and
-      # it has to come from outside the package. composer -d does not create the
-      # directory, so mkdir first or the step dies with "Invalid working
-      # directory specified".
-      - run: |
-          mkdir -p /tmp/crc
-          composer -d /tmp/crc require maglnet/composer-require-checker --no-progress
-
-      - run: /tmp/crc/vendor/bin/composer-require-checker check composer.json
+      - run: composer-require-checker check composer.json
 
       # No dev-free PHPStan step here, unlike the sibling packages that pair one
       # with this. src/ is nothing but traits, and PHPStan does not analyse a

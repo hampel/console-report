@@ -33,7 +33,7 @@ installed by every contributor to be run about once a release — so run it by h
 an import:
 
 ```bash
-composer -d /tmp/crc require maglnet/composer-require-checker
+mkdir -p /tmp/crc && composer -d /tmp/crc require maglnet/composer-require-checker
 /tmp/crc/vendor/bin/composer-require-checker check composer.json
 ```
 
