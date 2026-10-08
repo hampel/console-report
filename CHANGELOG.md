@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## Unreleased
+## 2.2.0 (2026-10-08)
 
 * added a `$strict` argument to `RendersChecks::checkExitCode()` — when set, a run that warned and
   did not fail exits 2. Called with no argument it behaves as before
