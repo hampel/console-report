@@ -57,7 +57,7 @@ for anything holding a path. `render()` puts both of its columns through a fixed
 including `EnsureRelativePaths`, which does a blunt `str_replace(base_path().'/', '', $string)` on
 every value, with no way to opt out:
 
-```
+```text
   Environment File ...................................................... .env
   Targets Path .......................................... storage/targets.toml
   Backup Disk ................................................. storage/backup
@@ -109,7 +109,7 @@ class Config extends Command
 }
 ```
 
-```
+```text
   Application ................................................................
   Version .............................................................. 7.2.0
   Environment File .......................................... /etc/backup/.env
@@ -176,7 +176,7 @@ class Validate extends Command
 }
 ```
 
-```
+```text
   [ ok ] rclone                   /usr/bin/rclone v1.60.1
   [warn] cloud remote             does not exist yet - it will be created on first transfer
   [fail] mysqldump                not found on PATH
@@ -201,7 +201,7 @@ $this->checkOk('credentials', 'accepted');
 $this->checkWarn('remote', 'does not exist yet');
 ```
 
-```
+```text
 
   Binaries
   [ ok ] rclone                   /usr/bin/rclone v1.60.1
