@@ -87,8 +87,8 @@ three in `tests/` are what the level-10 run actually checks:
 | `BareRenderer` | no console framework at all, only `setReportOutput()` |
 
 That is not only a level-10 concern. PHPStan does not merely infer less about an unused trait — it
-skips the body entirely, and reports `No errors` over code it never read. So the dev-free PHPStan
-job that the sibling packages pair with `composer-require-checker` is a no-op here and is
+skips the body entirely, and reports `No errors` over code it never read. So a dev-free PHPStan
+run, the usual companion to `composer-require-checker`, is a no-op here and is
 deliberately absent from `.github/workflows/tests.yml`; measured, an `Illuminate\Support\Str` call
 planted in a trait passes and the same call in a plain class under `src` is caught. Anything that
 wants to check `src` with `tests/` out of reach has to read the files itself.

@@ -81,10 +81,10 @@ jobs:
     # home and break nobody until Symfony reshuffles its packages. The other
     # half is illuminate/console, which is dev-only and must stay out of src/.
     #
-    # Note what this cannot see: the 2.0 audit found src/ calling Symfony
-    # Console while composer.json declared only illuminate/console, and no tool
-    # here would have caught it - that dependency was behavioural ($this->line())
-    # and referenced no symbol at all. This job covers symbols, nothing more.
+    # Note what this cannot see: a dependency that is behavioural and names no
+    # symbol. A trait calling $this->line() relies on the using class extending
+    # a command that provides it, and nothing in src/ says which package that
+    # is. This job covers symbols, nothing more.
 
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -104,8 +104,8 @@ jobs:
 
       - run: composer-require-checker check composer.json
 
-      # No dev-free PHPStan step here, unlike the sibling packages that pair one
-      # with this. src/ is nothing but traits, and PHPStan does not analyse a
+      # No dev-free PHPStan step here, though one is the usual companion to
+      # this check. src/ is nothing but traits, and PHPStan does not analyse a
       # trait that no analysed class uses - so pointing it at src/ with the dev
       # dependencies gone reports "No errors" over a body it never read. Measured:
       # an Illuminate\Support\Str call planted in a trait passes, the same call
