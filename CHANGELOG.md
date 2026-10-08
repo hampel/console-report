@@ -2,27 +2,15 @@
 
 ## Unreleased
 
-Additive: `checkExitCode()` called with no argument behaves exactly as before.
-
-* added a `$strict` argument to `RendersChecks::checkExitCode()` — with it, a run that warned and
-  did not fail exits 2, for a caller that wants to hear about a warning as well as a failure.
-  Failure is 1 either way, so this is not the monitoring-plugin numbering; the README has the table
+* added a `$strict` argument to `RendersChecks::checkExitCode()` — when set, a run that warned and
+  did not fail exits 2. Called with no argument it behaves as before
+* README sections renamed: `Output`, `Settings`, `Checks`, `Detail lines`
 
 ## 2.1.0 (2026-08-28)
 
-Additive: nothing already written renders differently, and only the first item below reaches a
-consumer at all.
-
-* added `RendersChecks::checkSection($title)` — a heading above a run of check rows, drawn the same
-  way `reportSettings()` introduces a section, so a command reporting settings and then checking
-  them speaks one visual language. It draws no rule under the title: a rule has to be measured, and
-  that is what hand-rolled versions of this get wrong, ruling with `strlen()` so a title with an
-  accent in it is underlined too far
-* CI now runs `composer-require-checker` against a `--no-dev` install, so a symbol `src` uses
-  without `require` naming it fails the build. `symfony/console` brings `symfony/string` and the
-  polyfills along with it, and a class from any of them would have resolved everywhere and been
-  caught by nothing
-* `hampel/rig` raised to `^1.1`, and the harness footer grouped with the `Io::values()` it adds
+* added `RendersChecks::checkSection($title)` — a heading above a run of check rows
+* CI runs `composer-require-checker`
+* `hampel/rig` raised to `^1.1`
 
 ## 2.0.0 (2026-08-22)
 
