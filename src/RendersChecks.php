@@ -41,9 +41,8 @@ trait RendersChecks
      * reportSettings() introduces a section - a blank line, then the heading - so a
      * command that reports its settings and then checks them speaks one visual language
      * throughout. It draws no rule under the title: the blank line and the weight of the
-     * colour are the break, and a rule would have to be measured, which is where the two
-     * hand-rolled copies this replaces went wrong (both ruled with strlen(), so a title
-     * with any multibyte character in it was underlined too far).
+     * colour are the break, and a rule would have to be measured, and measuring with
+     * strlen() underlines a title too far for every multibyte character in it.
      *
      * Optional, and a report that runs its checks in one undivided list needs nothing here.
      */
