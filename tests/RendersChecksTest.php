@@ -48,9 +48,9 @@ class RendersChecksTest extends TestCase
 
     public function testItDoesNotRuleUnderASectionHeading(): void
     {
-        // the two hand-rolled copies this replaces underlined with strlen(), so a title
-        // with any multibyte character in it was ruled one column too far per character.
-        // There is no rule here, so there is nothing to measure and nothing to get wrong
+        // a rule measured with strlen() runs one column too far for each multibyte
+        // character in the title. There is no rule here, so there is nothing to measure
+        // and nothing to get wrong
         $output = $this->render(fn (ReportCommand $command) => $command->showSection('Réseau'));
 
         $this->assertSame(['', '  Réseau'], $this->lines($output));
