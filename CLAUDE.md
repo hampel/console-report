@@ -22,7 +22,14 @@ vendor/bin/phpunit                              # full suite
 vendor/bin/phpunit --filter testItWrapsAValue   # single test
 vendor/bin/phpunit tests/FormatsValuesTest.php  # single file
 php8.5 vendor/bin/phpunit                       # ceiling of the supported range
+vendor/bin/phpunit --coverage-text; echo $?     # needs pcov or Xdebug; must exit 0
 ```
+
+**Run the coverage form whenever a test class or a trait's `use` changes.** `phpunit.xml` sets
+`beStrictAboutCoverageMetadata`, so a test that executes a trait its class names in neither
+`#[CoversTrait]` nor `#[UsesTrait]` is marked risky and the run exits 1 — but only when coverage is
+collected, and neither `composer check` nor CI collects it. The plain run stays green over stale
+attributes.
 
 `composer check` runs Pint, PHPStan and the suite. Individually: `composer lint` (Pint, no writes),
 `composer format` (Pint, writing), `composer analyse`, `composer test`.

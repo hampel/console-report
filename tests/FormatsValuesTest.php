@@ -5,10 +5,13 @@ declare(strict_types=1);
 namespace Hampel\ConsoleReport\Tests;
 
 use Hampel\ConsoleReport\FormatsValues;
+use Hampel\ConsoleReport\WritesReportOutput;
 use PHPUnit\Framework\Attributes\CoversTrait;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\UsesTrait;
 
 #[CoversTrait(FormatsValues::class)]
+#[UsesTrait(WritesReportOutput::class)]
 class FormatsValuesTest extends TestCase
 {
     public function testItPrintsAnAbsolutePathAsItIs(): void

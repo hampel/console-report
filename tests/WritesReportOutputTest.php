@@ -4,13 +4,16 @@ declare(strict_types=1);
 
 namespace Hampel\ConsoleReport\Tests;
 
+use Hampel\ConsoleReport\RendersDetails;
 use Hampel\ConsoleReport\WritesReportOutput;
 use LogicException;
 use PHPUnit\Framework\Attributes\CoversTrait;
+use PHPUnit\Framework\Attributes\UsesTrait;
 use PHPUnit\Framework\TestCase as BaseTestCase;
 use Symfony\Component\Console\Output\BufferedOutput;
 
 #[CoversTrait(WritesReportOutput::class)]
+#[UsesTrait(RendersDetails::class)]
 class WritesReportOutputTest extends BaseTestCase
 {
     public function testItSaysWhatToDoWhenNothingHasBeenGivenSomewhereToWrite(): void

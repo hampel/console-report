@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace Hampel\ConsoleReport\Tests;
 
+use Hampel\ConsoleReport\FormatsValues;
 use Hampel\ConsoleReport\RendersChecks;
 use Hampel\ConsoleReport\RendersDetails;
+use Hampel\ConsoleReport\ReportsSettings;
 use Illuminate\Console\Command;
 use Illuminate\Console\OutputStyle;
 use PHPUnit\Framework\Attributes\CoversTrait;
+use PHPUnit\Framework\Attributes\UsesTrait;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 
@@ -25,6 +28,8 @@ use Symfony\Component\Console\Output\BufferedOutput;
  */
 #[CoversTrait(RendersChecks::class)]
 #[CoversTrait(RendersDetails::class)]
+#[UsesTrait(FormatsValues::class)]
+#[UsesTrait(ReportsSettings::class)]
 class LaravelIntegrationTest extends TestCase
 {
     protected function setUp(): void
